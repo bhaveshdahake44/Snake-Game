@@ -36,7 +36,11 @@ Snake-Game/
 
 ## 📸 Screenshot
 
-(Add a screenshot here)
+(<img width="1361" height="605" alt="image" src="https://github.com/user-attachments/assets/d2480425-2c2d-4b98-bd76-90305e8a34a8" />
+
+<img width="1356" height="598" alt="image" src="https://github.com/user-attachments/assets/b53beed2-c9dd-48d9-b3f1-a9223df5ab65" />
+
+)
 
 ## 👨‍💻 Author
 
