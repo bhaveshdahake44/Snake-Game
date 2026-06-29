@@ -4,6 +4,7 @@ const modal = document.querySelector(".modal");
 const startGameModal = document.querySelector(".start-game");
 const gameOverModal = document.querySelector(".game-over");
 const restartButton = document.querySelector(".btn-restart");
+const controlButtons = document.querySelectorAll(".control-btn");
 
 const highScoreElement = document.querySelector("#high-score")
 const scoreElement = document.querySelector("#score")
@@ -35,6 +36,8 @@ let snake = [
 ]
 
 let direction = "down";
+let touchStartX = 0;
+let touchStartY = 0;
 
 for(let row = 0; row < rows; row++) {
     for(let col = 0; col < cols; col++) {
@@ -52,8 +55,7 @@ function render() {
         })
 }
 
-intervalId = setInterval(() => {
-
+function moveSnake() {
     let head = null;
  
     blocks[ `${food.x}-${food.y}` ].classList.add("food")
@@ -71,6 +73,7 @@ intervalId = setInterval(() => {
     if(head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
     
         clearInterval(intervalId)
+        clearInterval(timerIntervalId)
         modal.style.display = "flex";
         startGameModal.style.display = "none";
         gameOverModal.style.display = "flex"
@@ -101,12 +104,13 @@ intervalId = setInterval(() => {
     snake.unshift(head)
     snake.pop()
 
-    // render()
-},300);
+    render()
+}
 
-startButton.addEventListener("click", () => {
-    modal.style.display = "none";
-    intervalId = setInterval(() => { render() }, 300)
+function startGameLoop() {
+    clearInterval(intervalId)
+    clearInterval(timerIntervalId)
+    intervalId = setInterval(moveSnake, 300)
     timerIntervalId = setInterval( () => {
         let [ min, sec ] = time.split("-").map(Number)
 
@@ -120,6 +124,24 @@ startButton.addEventListener("click", () => {
         time = `${min}-${sec}`
         timeElement.innerText = time
     }, 1000)
+}
+
+function changeDirection(nextDirection) {
+    const opposites = {
+        up: "down",
+        down: "up",
+        left: "right",
+        right: "left"
+    }
+
+    if(opposites[nextDirection] !== direction) {
+        direction = nextDirection
+    }
+}
+
+startButton.addEventListener("click", () => {
+    modal.style.display = "none";
+    startGameLoop()
 })
 
 restartButton.addEventListener("click", restartGame)
@@ -141,18 +163,54 @@ function restartGame() {
     direction = "down";
     snake = [ { x: 1, y: 3}]
     food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols) }
-    intervalId = setInterval(() => { render() }, 300)
+    startGameLoop()
 }
 
 addEventListener("keydown", (event)=> {
     if(event.key == 'ArrowUp') {
-        direction = "up"
+        changeDirection("up")
     } else if(event.key == "ArrowDown") {
-        direction = "down"
+        changeDirection("down")
     } else if(event.key == "ArrowRight") {
-        direction = 'right'
+        changeDirection("right")
     } else if(event.key == "ArrowLeft") {
-        direction = 'left'
+        changeDirection("left")
     }
 })
 
+controlButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        changeDirection(button.dataset.direction)
+    })
+
+    button.addEventListener("touchstart", (event) => {
+        event.preventDefault()
+        changeDirection(button.dataset.direction)
+    }, { passive: false })
+})
+
+board.addEventListener("touchstart", (event) => {
+    const touch = event.changedTouches[0]
+    touchStartX = touch.clientX
+    touchStartY = touch.clientY
+}, { passive: true })
+
+board.addEventListener("touchmove", (event) => {
+    event.preventDefault()
+}, { passive: false })
+
+board.addEventListener("touchend", (event) => {
+    const touch = event.changedTouches[0]
+    const deltaX = touch.clientX - touchStartX
+    const deltaY = touch.clientY - touchStartY
+
+    if(Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 24) {
+        return
+    }
+
+    if(Math.abs(deltaX) > Math.abs(deltaY)) {
+        changeDirection(deltaX > 0 ? "right" : "left")
+    } else {
+        changeDirection(deltaY > 0 ? "down" : "up")
+    }
+}, { passive: true })
