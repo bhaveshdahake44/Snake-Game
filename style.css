@@ -6,8 +6,9 @@
 
 html, body {
     width: 100%;
-    height: 100%;
-
+    min-height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 :root{
@@ -49,7 +50,8 @@ html {
 
 main, section {
     width: 100%;
-    height: 100%;
+    height: 100dvh;
+    min-height: 100%;
 }
 
 .btn {
@@ -90,15 +92,19 @@ section .infos {
     border: 1px solid var(--border-primary-color);
     flex-grow: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
-    grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
+    grid-template-columns: repeat(var(--cols, 12), 1fr);
+    grid-template-rows: repeat(var(--rows, 12), 1fr);
+    min-height: 0;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .block {
-    /* width: 30px;
-    height: 30px; */
     border: 1px solid var(--border-primary-color);
     border-radius: 50%;
+    min-width: 0;
+    min-height: 0;
 }
 
 .fill {
@@ -110,10 +116,11 @@ section .infos {
 }
 
 .modal {
-    height: 100vh;
+    height: 100dvh;
     width: 100vw;
     position: fixed;
     top: 0;
+    left: 0;
     background-color: #35353587;
     backdrop-filter: blur(4px);
     display: flex;
@@ -131,4 +138,88 @@ section .infos {
 
 .modal .game-over {
     display: none;
+}
+
+.touch-controls {
+    display: none;
+    grid-template-columns: repeat(3, minmax(64px, 1fr));
+    grid-template-rows: repeat(2, 56px);
+    gap: var(--space-sm);
+    width: min(100%, 320px);
+    margin: var(--space-sm) auto 0;
+    touch-action: manipulation;
+}
+
+.control-btn {
+    border: 1px solid var(--border-primary-color);
+    border-radius: var(--border-radius-sm);
+    background: #191919;
+    color: var(--text-primary-color);
+    font-size: 1.6rem;
+    font-weight: 800;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.control-btn:active {
+    transform: scale(0.96);
+    background: #2a2a2a;
+}
+
+.control-up {
+    grid-column: 2;
+}
+
+.control-left {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.control-down {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.control-right {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+@media (max-width: 700px) {
+    section {
+        padding: var(--space-md);
+        gap: var(--space-md);
+    }
+
+    section .infos {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .info {
+        padding: var(--space-sm);
+        text-align: center;
+    }
+
+    .info h3 {
+        font-size: clamp(0.75rem, 3vw, 0.95rem);
+        line-height: 1.25;
+    }
+
+    .board {
+        aspect-ratio: 1;
+        flex-grow: 0;
+        width: min(100%, calc(100dvh - 210px));
+        align-self: center;
+    }
+
+    .touch-controls {
+        display: grid;
+    }
+
+    .btn:hover {
+        transform: none;
+    }
 }
